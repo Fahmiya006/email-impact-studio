@@ -1,0 +1,40 @@
+# One command on any server with Docker:   cp .env.example .env   (edit it)   then   docker compose up -d --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      SECURE_COOKIES: "1"
+      TRUST_PROXY: "1"
+      BASE_URL: ${BASE_URL:?Set BASE_URL in .env, for example https://studio.example.com}
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-1}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_SECURITY: ${SMTP_SECURITY:-starttls}
+    volumes:
+      - appdata:/data
+    expose:
+      - "8000"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env, for example studio.example.com}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  appdata:
+  caddy_data:
+  caddy_config:

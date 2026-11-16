@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Email Experiment Impact</title>
+<link rel="icon" type="image/png" href="__FAVICON__">
+<style>
+__FONT_FACE__
+/* Same look as the app: Calibri, black or white text, rounded cards, gradient number cards, no broken-line borders, sizes that scale with the screen. */
+:root{
+  --glass:linear-gradient(135deg,rgba(255,255,255,.74),rgba(255,255,255,.34)); --glass-strong:linear-gradient(135deg,rgba(255,255,255,.95),rgba(246,242,255,.84)); --glass-edge:rgba(255,255,255,.92); --blobs:radial-gradient(46rem 34rem at 6% -4%,rgba(124,92,255,.58),transparent 62%),radial-gradient(40rem 30rem at 98% 14%,rgba(63,124,240,.46),transparent 62%),radial-gradient(46rem 32rem at 70% 104%,rgba(255,107,139,.46),transparent 62%),radial-gradient(34rem 26rem at 0% 88%,rgba(56,208,255,.34),transparent 62%);
+  --i1:rgba(124,92,255,.2); --i2:rgba(63,124,240,.2); --i3:rgba(255,107,139,.22); --i4:rgba(255,184,0,.26);
+  --bg:#f3f1fb; --card:#ffffff; --field:rgba(255,255,255,.62); --ink:#000000; --on-ink:#ffffff; --accent:#6d4fd6; --accent-ink:#ffffff; --tint:rgba(124,92,255,.16); --line:rgba(109,79,214,.24); --grid:#e3def8; --best:rgba(34,197,94,.24);
+  --mens:#6d4fd6; --womens:#e0475e; --ctrl:#2f6bff; --bad:#c81e4a; --good:#15803d; --both:#e08a00;
+  --h-none:#ffe28a; --h-mens:#d8ccff; --h-model:#ffc4cf; --shadow:0 10px 32px rgba(76,47,179,.12);
+  --font:Calibri,sans-serif; --art:url("__BG_LIGHT__"); color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --glass:linear-gradient(135deg,rgba(255,255,255,.17),rgba(255,255,255,.05)); --glass-strong:linear-gradient(135deg,rgba(52,44,118,.97),rgba(30,26,72,.95)); --glass-edge:rgba(255,255,255,.24); --blobs:radial-gradient(46rem 34rem at 6% -4%,rgba(124,92,255,.55),transparent 62%),radial-gradient(40rem 30rem at 98% 14%,rgba(63,124,240,.42),transparent 62%),radial-gradient(46rem 32rem at 70% 104%,rgba(226,74,103,.42),transparent 62%),radial-gradient(34rem 26rem at 0% 88%,rgba(34,170,220,.30),transparent 62%);
+  --i1:rgba(124,92,255,.32); --i2:rgba(63,124,240,.32); --i3:rgba(226,74,103,.34); --i4:rgba(255,184,0,.28);
+    --bg:#0c0a1d; --card:#16132b; --field:rgba(255,255,255,.09); --ink:#ffffff; --on-ink:#000000; --accent:#a78bfa; --accent-ink:#000000; --tint:rgba(167,139,250,.22); --line:rgba(255,255,255,.16); --grid:#2b2658; --best:rgba(74,222,128,.22);
+    --mens:#a78bfa; --womens:#ff8fa3; --ctrl:#7aa7ff; --bad:#ff7b72; --good:#4ade80; --both:#ffc266;
+    --h-none:#6b5200; --h-mens:#4a3a96; --h-model:#8a2c45; --shadow:0 10px 32px rgba(0,0,0,.5); --art:url("__BG_DARK__"); color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{font-size:clamp(16px,.2vw + 14.5px,18px)}
+html,body{margin:0}
+body{background-color:var(--bg);background-image:var(--blobs),var(--art);background-size:auto,auto,auto,auto,clamp(340px,36vw,560px);background-attachment:fixed,fixed,fixed,fixed,scroll;color:var(--ink);font:1rem/1.5 var(--font);-webkit-text-size-adjust:100%;min-height:100vh;min-height:100dvh}
+/*APP_HEADER_CSS*/
+.wrap{padding:clamp(1rem,2.2vw,2.25rem) clamp(1rem,3vw,2.5rem) 3rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,34rem),1fr));gap:1.25rem;align-items:start;min-width:0}
+.wrap>header,.wrap>#tiles,.wrap>#who,.wrap>#simulator,.wrap>#policies,.wrap>#method,.wrap>footer{grid-column:1/-1}
+#segChart{max-width:56rem} #costChart{max-width:62rem}
+h1,h2{font-family:var(--font);font-weight:700;text-wrap:balance;margin:0;color:var(--ink)}
+h1{font-size:clamp(1.6rem,1.1rem + 1.4vw,2.4rem);line-height:1.15}
+h2{font-size:clamp(1.15rem,1rem + .5vw,1.45rem);line-height:1.25}
+a{color:var(--ink);font-weight:700}
+.card{background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);border:1px solid var(--glass-edge);border-radius:1.5rem;box-shadow:var(--shadow),inset 0 1px 0 var(--glass-edge);padding:clamp(1rem,1.8vw,1.6rem);display:flex;flex-direction:column;gap:1rem;min-width:0}
+.seg{display:inline-flex;background:var(--tint);border-radius:999px;padding:.2rem;align-self:flex-start;flex-wrap:wrap}
+.seg button{font:inherit;font-weight:700;font-size:.92rem;padding:.35rem .9rem;border:0;border-radius:999px;background:transparent;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+svg{width:100%;height:auto;display:block;overflow:visible}
+svg text{fill:var(--ink);font:12.5px var(--font)}
+svg .lbl{font-weight:700}
+svg rect{rx:5px}
+.zone-good{fill:rgba(34,197,94,.13);rx:0} .zone-bad{fill:rgba(240,70,100,.12);rx:0}
+svg text.zone{font-size:12.5px;letter-spacing:.03em} svg text.ax{font-size:14.5px} svg text.end{font-size:14px}
+svg text.halo{paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+.guides{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,26rem),1fr));gap:1.25rem;align-items:start}
+.guides>div{display:flex;flex-direction:column;gap:.6rem;min-width:0}
+h3{font-family:var(--font);font-size:1.05rem;line-height:1.25;margin:0}
+.legend{display:flex;gap:.3rem 1.1rem;flex-wrap:wrap;font-size:.92rem}
+.legend i{display:inline-block;width:.8rem;height:.8rem;border-radius:50%;margin-right:.4rem;vertical-align:-1px}
+.scroll{overflow-x:auto;border-radius:1rem;border:1px solid var(--line);background:var(--glass)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:.6rem .9rem;text-align:left;vertical-align:top}
+th{background:var(--tint);font-weight:700;font-size:.95rem}
+td{border-top:1px solid var(--line)}
+tbody tr.best td{background:var(--best);font-weight:700}
+th.num,td.num{text-align:right}
+td.item{font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(12.5rem,1fr));gap:1rem}
+.kpi{position:relative;overflow:hidden;color:#ffffff;border:1px solid rgba(255,255,255,.55);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-radius:1.5rem;padding:1.1rem 1.3rem 1.2rem;min-height:9rem;display:flex;flex-direction:column;gap:.3rem;box-shadow:0 18px 38px var(--glow,rgba(76,47,179,.3)),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.18)}
+.kpi::before{content:"";position:absolute;width:10rem;height:10rem;border-radius:50%;right:-3rem;bottom:-4rem;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.42),rgba(255,255,255,.06) 70%);pointer-events:none}
+.kpi::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 0%,rgba(255,255,255,.28),rgba(255,255,255,0) 60%);pointer-events:none}
+.kpi>*{position:relative;z-index:1}
+.kpi .k{font-weight:700;font-size:.95rem}
+.kpi .v{font-size:clamp(1.9rem,1.5rem + 1.5vw,2.7rem);font-weight:700;line-height:1.1}
+.kpi .s{font-size:.92rem}
+.g1{--glow:rgba(92,60,210,.42);background:linear-gradient(135deg,#4c2fb3,#7b5ce6)} .g2{--glow:rgba(40,100,230,.4);background:linear-gradient(135deg,#1b4fc9,#2f6bea)}
+.g3{--glow:rgba(214,58,94,.4);background:linear-gradient(135deg,#b3174e,#d63a5e)} .g4{--glow:rgba(31,138,76,.36);background:linear-gradient(135deg,#a8470a,#1f8a4c)}
+.pos,.neg{font-weight:700}
+.sim{display:grid;grid-template-columns:minmax(0,21rem) minmax(0,1fr);gap:1.25rem}
+@media (max-width:48rem){.sim{grid-template-columns:minmax(0,1fr)}}
+.ctrl{display:flex;flex-direction:column;gap:.9rem}
+.ctrl label{display:flex;flex-direction:column;gap:.25rem}
+.ctrl label .row{display:flex;justify-content:space-between;font-weight:700}
+.ctrl output{font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=radio]{accent-color:var(--accent);width:1.05rem;height:1.05rem}
+.radios{display:flex;flex-direction:column;gap:.35rem}
+.radios label{flex-direction:row;align-items:center;gap:.5rem;font-weight:400}
+.res{display:flex;flex-direction:column;gap:.9rem}
+table.heat td{text-align:center;font-weight:700}
+table.heat td:first-child{text-align:left}
+table.heat td.none{background:var(--h-none) !important} table.heat td.blanket_mens{background:var(--h-mens) !important} table.heat td.model{background:var(--h-model) !important}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--on-ink);padding:.4rem .6rem;border-radius:.7rem;font-size:.85rem;line-height:1.35;max-width:18rem;z-index:9;display:none}
+footer{font-size:.9rem;text-align:center}
+</style>
+</head>
+<body>
+<!--APP_HEADER-->
+
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:.75rem">
+  <h1 id="top">Did the email cause the extra sales?</h1>
+  <div id="intro"></div>
+</header>
+
+<section class="card" id="tiles"><h2>Headline results</h2><div class="kpis" id="kpis"></div><div id="tilesTable"></div></section>
+
+<section class="card" id="experiment">
+  <h2>Experiment results</h2>
+  <div class="seg" id="metricSeg" role="group" aria-label="Metric"></div>
+  <svg id="armChart" viewBox="0 0 720 330" role="img" aria-label="Outcome by email group"></svg>
+  <div id="effectTable"></div>
+  <h2>Integrity checks</h2>
+  <div id="expNote"></div>
+</section>
+
+<section class="card" id="bias">
+  <h2>Biased rollout test</h2>
+  <div id="biasSetup"></div>
+  <div class="seg" id="biasSeg" role="group" aria-label="Outcome"></div>
+  <svg id="biasChart" viewBox="0 0 720 330" role="img" aria-label="Estimates by method"></svg>
+  <div id="biasNote"></div>
+</section>
+
+<section class="card" id="who">
+  <h2>Who responds</h2>
+  <div class="legend"><span><i style="background:var(--mens)"></i>Men's email</span><span><i style="background:var(--womens)"></i>Women's email</span><span>Dot = average, line = 95% interval</span></div>
+  <svg id="segChart" viewBox="0 0 720 480" role="img" aria-label="Visit lift by customer group"></svg>
+  <div id="segTable"></div>
+  <div id="whoNote"></div>
+</section>
+
+<section class="card" id="simulator">
+  <h2>Profit simulator</h2>
+  <div class="sim">
+    <div class="ctrl">
+      <label for="margin"><span class="row"><span>Gross margin</span><output id="marginOut"></output></span>
+        <input type="range" id="margin" min="10" max="70" step="1" value="40"></label>
+      <label for="cost"><span class="row"><span>Cost per email</span><output id="costOut"></output></span>
+        <input type="range" id="cost" min="0" max="150" step="1" value="10"></label>
+      <label for="cust"><span class="row"><span>Customers on list</span><output id="custOut"></output></span>
+        <input type="range" id="cust" min="10" max="500" step="10" value="100"></label>
+      <div class="radios" id="policyRadios" role="radiogroup" aria-label="Policy"></div>
+      <label for="topf" id="topfWrap"><span class="row"><span>Share emailed (model)</span><output id="topfOut"></output></span>
+        <input type="range" id="topf" min="5" max="100" step="5" value="50"></label>
+    </div>
+    <div class="res">
+      <div id="simTable"></div>
+      <svg id="costChart" viewBox="0 0 760 440" role="img" aria-label="Profit per customer by cost per email for each policy. Lines above the zero line earn money, lines below lose money."></svg>
+      <div class="guides" id="costGuide"></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="policies">
+  <h2>Policy comparison</h2>
+  <div id="policyTable"></div>
+  <div id="policyNote"></div>
+  <h2>Winning policy by economics</h2>
+  <div class="legend"><span><i style="background:var(--h-none)"></i>Send nothing</span><span><i style="background:var(--h-mens)"></i>Men's email to everyone</span><span><i style="background:var(--h-model)"></i>Uplift model</span></div>
+  <div class="scroll"><table class="heat" id="heat"></table></div>
+  <div id="heatNote"></div>
+</section>
+
+<section class="card" id="method">
+  <h2>Method and limits</h2>
+  <div id="methodList"></div>
+</section>
+
+<footer>Source: Hillstrom email test (2008), 64,000 customers, three randomized groups. Margin and email cost are assumptions, not data.</footer>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const D = __DATA__;
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const usd = (x,d=2) => { const a=Math.abs(x).toFixed(d); return (x<0&&+a!==0?"-":"")+"$"+a; };
+const usdk = x => (x<0?"-":"")+"$"+Math.round(Math.abs(x)).toLocaleString("en-US");
+const pct = (x,d=1) => (x*100).toFixed(d)+"%";
+const sgn = (x,d=2) => (x>=0?"+":"-")+Math.abs(x).toFixed(d);
+function el(tag, attrs={}, parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
+function txt(parent,x,y,s,attrs={}){ const t=el("text",Object.assign({x,y},attrs),parent); t.textContent=s; return t; }
+function clear(n){ while(n.firstChild) n.removeChild(n.firstChild); }
+// axis with round tick values: returns {min,max,ticks,step}
+function niceScale(lo,hi,n){ n=n||5; const span=(hi-lo)||1, raw=span/n, p=Math.pow(10,Math.floor(Math.log10(raw))), f=raw/p;
+  const step=(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p, a=Math.floor(lo/step+1e-9)*step, b=Math.ceil(hi/step-1e-9)*step, ticks=[];
+  for(let v=a; v<=b+step/2; v+=step) ticks.push(+v.toFixed(10));
+  return {min:a,max:b,ticks,step}; }
+const decs = step => (String(+step.toFixed(10)).split(".")[1]||"").length;
+function axisTitle(svg,x,y,s,rot){ return txt(svg,x,y,s,rot?{transform:`translate(${x} ${y}) rotate(-90)`,x:0,y:0,"text-anchor":"middle",class:"lbl"}:{"text-anchor":"middle",class:"lbl"}); }
+function nice(max){ const p=Math.pow(10,Math.floor(Math.log10(max))); const f=max/p; return (f<=1?1:f<=2?2:f<=5?5:10)*p; }
+
+// ---- tables: ruled rows and columns, bold header
+function tbl(head, rows, o){
+  o=o||{}; const num=new Set(o.num||[]);
+  const th=head.map((h,i)=>`<th class="${num.has(i)?"num":""}">${h}</th>`).join("");
+  const trs=rows.map(r=>{ const cells=r.cells||r, cls=r.cls||"";
+    return `<tr class="${cls}">`+cells.map((c,i)=>`<td class="${(num.has(i)?"num ":"")+(o.item&&i===0?"item":"")}">${c}</td>`).join("")+"</tr>"; }).join("");
+  return `<div class="scroll"><table>${"<thead><tr>"+th+"</tr></thead>"}<tbody>${trs}</tbody></table></div>`;
+}
+const why = (head, rows) => tbl(head||["Item","Result","Why"], rows, {item:true});
+
+// ---- tooltip
+const tip = $("tip");
+document.addEventListener("mousemove", e=>{
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if(!t){ tip.style.display="none"; return; }
+  tip.textContent = t.getAttribute("data-tip"); tip.style.display="block";
+  const w = tip.offsetWidth; tip.style.left = Math.min(window.innerWidth-w-8, e.clientX+12)+"px"; tip.style.top=(e.clientY+14)+"px";
+});
+
+// ---- intro
+$("intro").innerHTML = why(["Part","What it shows","Why it matters"],[
+  ["Randomized test","64,000 customers randomly given no email, a men's email or a women's email","Random assignment makes group differences a fair measure of the email's effect"],
+  ["Stress test","Common methods tried on a deliberately biased rollout","Shows which methods fail without randomization"],
+  ["Profit model","Which email each customer should get","Turns lift into dollars you can compare"]]);
+
+// ---- headline results
+(function(){
+  const m = D.effects["Mens email vs No email"], bc = D.bc;
+  const kp=(c,k,v,sub)=>'<div class="kpi '+c+'"><span class="k">'+k+'</span><span class="v">'+v+'</span><span class="s">'+sub+'</span></div>';
+  $("kpis").innerHTML =
+    kp("g1","Spend lift, men's email",(m.spend.diff>=0?"+":"-")+usd(Math.abs(m.spend.diff)),"per customer, 95%: "+sgn(m.spend.ci[0])+" to "+sgn(m.spend.ci[1]))+
+    kp("g2","Visit rate",pct(m.visit.treat),"vs "+pct(m.visit.control)+" with no email")+
+    kp("g3","Naive error","+"+Math.round(D.obs.sim.spend["Naive difference"].bias_pct_of_benchmark)+"%","in a biased rollout")+
+    kp("g4","Break-even cost",usd(bc.breakeven_cost_per_email),"per email");
+  $("tilesTable").innerHTML = tbl(["Measure","Result","Meaning"],[
+    ["Spend lift, men's email", sgn(m.spend.diff)+" per customer (95% CI "+sgn(m.spend.ci[0])+" to "+sgn(m.spend.ci[1])+")", "What the men's email added to two-week spend"],
+    ["Visit rate", pct(m.visit.control)+" to "+pct(m.visit.treat)+" ("+sgn(m.visit.diff*100,1)+" points)", "Share of customers who visited the site, no email vs men's email"],
+    ["Naive error in a biased rollout", "+"+Math.round(D.obs.sim.spend["Naive difference"].bias_pct_of_benchmark)+"%", "How much a plain comparison overstates the spend lift; adjusted methods land within a few percent"],
+    ["Profit, men's email to all", "+"+usdk(bc.incremental_vs_nothing)+" per 1M customers", "At "+Math.round(D.assumptions.gross_margin*100)+"% margin and "+usd(D.assumptions.cost_per_email)+" per email"],
+    ["Break-even cost per email", usd(bc.breakeven_cost_per_email), "Above this, emailing everyone loses money"]],{item:true});
+})();
+
+// ---- segmented control helper
+function makeSeg(id, items, onPick, start){
+  const root=$(id); let cur=start||items[0][0];
+  function paint(){ root.innerHTML=""; items.forEach(([k,l])=>{ const b=document.createElement("button"); b.type="button"; b.textContent=l; b.setAttribute("aria-pressed", k===cur); b.onclick=()=>{cur=k;paint();onPick(k)}; root.appendChild(b); }); }
+  paint(); onPick(cur);
+}
+
+// ---- experiment section
+const METRICS = {visit:{label:"Site visit rate",fmt:x=>pct(x,1)}, conversion:{label:"Conversion rate",fmt:x=>pct(x,2)}, spend:{label:"Average spend per customer",fmt:x=>usd(x)}};
+function drawArms(metric){
+  const svg=$("armChart"); clear(svg); const W=720,H=330,L=80,R=20,T=34,B=66;
+  const M=METRICS[metric], rows=D.arm_stats[metric];
+  const sc=niceScale(0,Math.max(...rows.map(r=>r.hi))*1.08,5), pd=Math.max(0,decs(sc.step*100));
+  const tick=v=>metric==="spend"?usd(v,2):pct(v,pd);
+  const y=v=>T+(H-T-B)*(1-(v-sc.min)/(sc.max-sc.min));
+  sc.ticks.forEach(v=>{ el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:css("--grid")},svg); el("line",{x1:L-5,x2:L,y1:y(v),y2:y(v),stroke:css("--ink")},svg); txt(svg,L-9,y(v)+4,tick(v),{"text-anchor":"end"}); });
+  el("line",{x1:L,x2:L,y1:T,y2:y(0),stroke:css("--ink"),"stroke-width":2},svg); el("line",{x1:L,x2:W-R,y1:y(0),y2:y(0),stroke:css("--ink"),"stroke-width":2},svg);
+  axisTitle(svg,16,(T+H-B)/2,M.label,true);
+  const names=["No email","Men's email","Women's email"], cols=[css("--ctrl"),css("--mens"),css("--womens")];
+  const bw=120, gap=(W-L-R-3*bw)/4;
+  rows.forEach((r,i)=>{
+    const x=L+gap+(bw+gap)*i, cx=x+bw/2;
+    el("rect",{x,y:y(r.mean),width:bw,height:y(0)-y(r.mean),fill:cols[i],"data-tip":`${names[i]}: ${M.fmt(r.mean)} (95% CI ${M.fmt(r.lo)} to ${M.fmt(r.hi)}), n=${r.n.toLocaleString()}`},svg);
+    el("line",{x1:cx,x2:cx,y1:y(r.lo),y2:y(r.hi),stroke:css("--ink"),"stroke-width":2},svg);
+    el("line",{x1:cx-8,x2:cx+8,y1:y(r.lo),y2:y(r.lo),stroke:css("--ink"),"stroke-width":2},svg); el("line",{x1:cx-8,x2:cx+8,y1:y(r.hi),y2:y(r.hi),stroke:css("--ink"),"stroke-width":2},svg);
+    txt(svg,cx,y(r.hi)-9,M.fmt(r.mean),{"text-anchor":"middle",class:"lbl"});
+    txt(svg,cx,H-B+20,names[i],{"text-anchor":"middle",class:"lbl"}); txt(svg,cx,H-B+38,"n = "+r.n.toLocaleString(),{"text-anchor":"middle"});
+  });
+  txt(svg,W-R,T-14,"Bar = average, whisker = 95% interval",{"text-anchor":"end"});
+  const E=D.effects, rowsT=["Mens email vs No email","Womens email vs No email","Mens vs Womens email"];
+  $("effectTable").innerHTML=tbl(["Comparison","Difference","95% CI","Relative","p-value","Why"], rowsT.map(k=>{
+    const e=E[k][metric], isp=metric!=="spend"; const sc=isp?100:1; const u=isp?" pp":"";
+    const p=e.p<0.001?"<0.001":e.p.toFixed(3);
+    const w=e.p<0.05?"Unlikely to be chance":"Could be chance";
+    return [k.replace("Mens","Men's").replace("Womens","Women's"), sgn(e.diff*sc,2)+u, sgn(e.ci[0]*sc)+" to "+sgn(e.ci[1]*sc)+u, sgn(e.rel_lift*100,0)+"%", p, w]}),{num:[1,2,3,4],item:true});
+}
+makeSeg("metricSeg",[["visit","Visit rate"],["conversion","Conversion"],["spend","Spend"]],drawArms,"spend");
+$("expNote").innerHTML = why(["Check","Result","Why"],[
+  ["Group sizes","p = "+D.srm_p.toFixed(2), D.srm_p>0.05?"They match a three-way split, so assignment looks random":"They do not match a three-way split, so assignment may be flawed"],
+  ["Covariate balance","Largest gap "+D.max_smd.toFixed(3)+" standard deviations","The groups looked alike before the email"],
+  ["Detectable lift","About "+Math.round(D.power.mde_relative_at_actual_n*100)+"% relative","The smallest effect this sample can reliably find at a baseline conversion of "+pct(D.power.baseline_conversion,2)],
+  ["Past-spend adjustment (CUPED)","Variance cut by "+D.cuped.cuped_history.var_reduction_pct.toFixed(2)+"%","Past spend barely predicts the next two weeks (correlation "+D.cuped.corr_history_spend.toFixed(2)+")"]]);
+
+// ---- bias section
+const METHODS=["Naive difference","Regression adjustment","IPW","PS matching","Doubly robust (AIPW)"];
+const MLAB={"Naive difference":"Naive difference","Regression adjustment":"Regression adjustment","IPW":"Inverse-probability weighting","PS matching":"Propensity matching","Doubly robust (AIPW)":"Doubly robust"};
+$("biasSetup").innerHTML = why(["Item","Detail","Why"],[
+  ["Setup","Loyal customers made more likely to be emailed","Mimics a rollout where the best customers are emailed first"],
+  ["Repeats",D.obs.reps+" random draws","Shows how each method behaves, not one lucky run"],
+  ["Benchmark","True effect from the randomized test (black line)","The answer every method should land on"]]);
+function drawBias(o){
+  const svg=$("biasChart"); clear(svg); const W=720,H=330,L=190,R=70,T=26,B=62;
+  const sc_=o==="spend"?1:100, unit=o==="spend"?"$":"pp";
+  const b=D.obs.bench[o]*sc_; const S=D.obs.sim[o];
+  const vals=METHODS.map(m=>({m,mean:S[m].mean*sc_,sd:S[m].sd*sc_,bias:S[m].bias_pct_of_benchmark}));
+  const ax=niceScale(Math.min(0,...vals.map(v=>v.mean-v.sd)), Math.max(...vals.map(v=>v.mean+v.sd),b)*1.04, 6), dd=o==="spend"?Math.max(2,decs(ax.step)):decs(ax.step);
+  const x=v=>L+(W-L-R)*(v-ax.min)/(ax.max-ax.min);
+  ax.ticks.forEach(v=>{ el("line",{x1:x(v),x2:x(v),y1:T,y2:H-B,stroke:css("--grid")},svg); el("line",{x1:x(v),x2:x(v),y1:H-B,y2:H-B+5,stroke:css("--ink")},svg); txt(svg,x(v),H-B+20,(o==="spend"?"$":"")+v.toFixed(dd),{"text-anchor":"middle"}); });
+  el("line",{x1:L,x2:W-R,y1:H-B,y2:H-B,stroke:css("--ink"),"stroke-width":2},svg); el("line",{x1:L,x2:L,y1:T,y2:H-B,stroke:css("--ink"),"stroke-width":2},svg);
+  axisTitle(svg,(L+W-R)/2,H-14,o==="spend"?"Estimated spend lift per customer ($)":"Estimated lift (percentage points)");
+  const rowH=(H-T-B)/vals.length;
+  vals.forEach((v,i)=>{
+    const cy=T+rowH*i+rowH/2, bad=i===0, col=bad?css("--bad"):css("--mens");
+    txt(svg,L-10,cy+4,MLAB[v.m],{"text-anchor":"end",class:"lbl"});
+    el("line",{x1:x(v.mean-v.sd),x2:x(v.mean+v.sd),y1:cy,y2:cy,stroke:col,"stroke-width":3},svg);
+    el("line",{x1:x(v.mean-v.sd),x2:x(v.mean-v.sd),y1:cy-6,y2:cy+6,stroke:col,"stroke-width":3},svg); el("line",{x1:x(v.mean+v.sd),x2:x(v.mean+v.sd),y1:cy-6,y2:cy+6,stroke:col,"stroke-width":3},svg);
+    el("circle",{cx:x(v.mean),cy,r:7,fill:col,"data-tip":`${MLAB[v.m]}: average ${unit==="$"?"$"+v.mean.toFixed(3):v.mean.toFixed(2)+" pp"} across draws (${sgn(v.bias,0)}% vs true effect), spread ±${v.sd.toFixed(unit==="$"?3:2)}`},svg);
+    txt(svg,W-R+8,cy+4,(unit==="$"?"$":"")+v.mean.toFixed(unit==="$"?2:1)+(unit==="$"?"":" pp"),{class:"lbl"});
+  });
+  el("line",{x1:x(b),x2:x(b),y1:T,y2:H-B,stroke:css("--ink"),"stroke-width":2.5},svg);
+  txt(svg,x(b),T-8,"True effect "+(unit==="$"?"$":"")+b.toFixed(unit==="$"?2:1)+(unit==="$"?"":" pp"),{"text-anchor":"middle",class:"lbl"});
+  const nv=vals[0], others=vals.slice(1).reduce((m,v)=>Math.max(m,Math.abs(v.bias)),0);
+  $("biasNote").innerHTML=why(["Finding","Result","Why"],[
+    ["Naive comparison",sgn(nv.bias,0)+"% from the truth","Emailed customers were already the loyal, higher-spending ones"],
+    ["Adjusting methods","Within "+Math.round(others)+"% of the truth","They account for who got the email"],
+    ["Dots and whiskers","Average over draws, plus one standard deviation","Shows the bias and the noise together"],
+    ["Difference-in-differences","Not used","The data has no before-and-after period"]]);
+}
+makeSeg("biasSeg",[["visit","Visit rate"],["conversion","Conversion"],["spend","Spend"]],drawBias,"visit");
+
+// ---- segments
+function drawSegChart(){
+  const rows=D.segs, svg=$("segChart"); clear(svg);
+  const W=720,L=170,R=30,T=34,B=58,rowH=36,H=T+B+rows.length*rowH; svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  const ax=niceScale(Math.min(0,...rows.flatMap(r=>[r.mens.visit_ci[0],r.womens.visit_ci[0]])), Math.max(...rows.flatMap(r=>[r.mens.visit_ci[1],r.womens.visit_ci[1]]))*1.03, 7), dd=decs(ax.step);
+  const x=v=>L+(W-L-R)*(v-ax.min)/(ax.max-ax.min);
+  ax.ticks.forEach(v=>{ el("line",{x1:x(v),x2:x(v),y1:T,y2:H-B,stroke:css("--grid")},svg); el("line",{x1:x(v),x2:x(v),y1:H-B,y2:H-B+5,stroke:css("--ink")},svg); txt(svg,x(v),H-B+20,(v>0?"+":"")+v.toFixed(dd),{"text-anchor":"middle"}); });
+  el("line",{x1:L,x2:W-R,y1:H-B,y2:H-B,stroke:css("--ink"),"stroke-width":2},svg);
+  el("line",{x1:x(0),x2:x(0),y1:T,y2:H-B,stroke:css("--ink"),"stroke-width":2.5},svg);
+  txt(svg,x(0),T-10,"No change",{"text-anchor":"middle",class:"lbl"});
+  axisTitle(svg,(L+W-R)/2,H-12,"Visit lift vs no email (percentage points)");
+  rows.forEach((r,i)=>{
+    const cy=T+rowH*i+rowH/2;
+    txt(svg,L-10,cy+4,r.segment,{"text-anchor":"end",class:"lbl"});
+    [[r.mens,css("--mens"),-8],[r.womens,css("--womens"),8]].forEach(([e,col,dy])=>{
+      el("line",{x1:x(e.visit_ci[0]),x2:x(e.visit_ci[1]),y1:cy+dy,y2:cy+dy,stroke:col,"stroke-width":2.5},svg);
+      el("line",{x1:x(e.visit_ci[0]),x2:x(e.visit_ci[0]),y1:cy+dy-4,y2:cy+dy+4,stroke:col,"stroke-width":2.5},svg); el("line",{x1:x(e.visit_ci[1]),x2:x(e.visit_ci[1]),y1:cy+dy-4,y2:cy+dy+4,stroke:col,"stroke-width":2.5},svg);
+      el("circle",{cx:x(e.visit_lift_pp),cy:cy+dy,r:5,fill:col,"data-tip":`${r.segment}: ${e.visit_lift_pp.toFixed(1)} pp (95% CI ${e.visit_ci[0].toFixed(1)} to ${e.visit_ci[1].toFixed(1)})`},svg);
+    });
+  });
+}
+(function(){
+  const rows=D.segs; drawSegChart();
+  $("segTable").innerHTML=tbl(["Customer group","Customers","Men's visit lift (pp)","Women's visit lift (pp)","Men's spend lift","Women's spend lift"], rows.map(r=>[
+    r.segment, r.n.toLocaleString(), sgn(r.mens.visit_lift_pp,1)+" ("+sgn(r.mens.visit_ci[0],1)+" to "+sgn(r.mens.visit_ci[1],1)+")", sgn(r.womens.visit_lift_pp,1)+" ("+sgn(r.womens.visit_ci[0],1)+" to "+sgn(r.womens.visit_ci[1],1)+")", sgn(r.mens.spend_lift), sgn(r.womens.spend_lift)]),{num:[1,2,3,4,5],item:true});
+  const both=D.segs.find(s=>s.segment==="Bought both"), mo=D.segs.find(s=>s.segment==="Bought men's only");
+  $("whoNote").innerHTML=why(["Finding","Result","Why"],[
+    ["Matching email to past purchases","Men's-only buyers barely react to the women's email ("+sgn(mo.womens.visit_lift_pp,1)+" pp)","So matching the email to purchase history does not help"],
+    ["Best-responding group","Bought both: "+sgn(both.mens.visit_lift_pp,1)+" pp visit lift from the men's email","They respond most and spend most"],
+    ["Spend","The email roughly doubles spend in every group","Dollar gains are largest where baseline spend is highest"],
+    ["Bought-both difference","Visits: clear. Spend: not clear (p = "+D.both_int.spend.p.toFixed(2)+")","The groups were not pre-registered, so treat small differences with caution"]]);
+})();
+
+// ---- simulator
+const POL=[["none","Send nothing"],["mens","Men's email to everyone"],["womens","Women's email to everyone"],["both","Men's email, bought-both only"],["model","Uplift model, top share"]];
+let pol="mens";
+function polRev(key, f){
+  const A=D.arm_rev;
+  if(key==="none") return {R:A.none,share:0};
+  if(key==="mens") return {R:A.mens,share:1};
+  if(key==="womens") return {R:A.womens,share:1};
+  if(key==="both") return {R:D.R_both,share:D.share_both};
+  const fr=D.curve.fractions, rv=D.curve.revenue_per_customer; const i=Math.round(f*20);
+  return {R:rv[i],lo:D.curve.ci_lo[i],hi:D.curve.ci_hi[i],share:fr[i]};
+}
+function simState(){ return {m:+$("margin").value/100, c:+$("cost").value/100, n:+$("cust").value*1000, f:+$("topf").value/100}; }
+function profitPC(key,s,c){ const p=polRev(key,s.f); return s.m*p.R-(c===undefined?s.c:c)*p.share; }
+function drawSim(){
+  const s=simState();
+  $("marginOut").textContent=Math.round(s.m*100)+"%"; $("costOut").textContent=usd(s.c); $("custOut").textContent=s.n.toLocaleString(); $("topfOut").textContent=Math.round(s.f*100)+"%";
+  $("topfWrap").style.display=pol==="model"?"flex":"none";
+  const p=polRev(pol,s), base=profitPC("none",s), mine=profitPC(pol,s);
+  const d=(mine-base)*s.n, be0=s.m*(D.arm_rev.mens-D.arm_rev.none);
+  const rows=[
+    ["Expected profit",usdk(mine*s.n)+" ("+usd(mine,3)+" per customer)","Margin times revenue, minus email cost, for the whole list"],
+    ["Vs sending nothing",`<b class="${d>=0?"pos":"neg"}">${d>=0?"+":""}${usdk(d)}</b>`,"Profit of this policy minus profit of sending nothing"]];
+  if(pol==="model"){ const lo=s.m*p.lo-s.c*p.share, hi=s.m*p.hi-s.c*p.share; rows.push(["Sampling range",usd(lo,3)+" to "+usd(hi,3)+" per customer","Differences smaller than this range are noise"]); }
+  rows.push(["Break-even cost, men's to all",usd(be0),"Above this cost, emailing everyone loses money at "+Math.round(s.m*100)+"% margin"]);
+  rows.push(["Black line in chart",usd(s.c)+" per email","Your current cost, so you can see where each policy stands"]);
+  $("simTable").innerHTML=why(["Item","Result","Why"],rows);
+  // chart: profit per customer vs cost per email, with zones, named lines, dots at your cost and rings at break-even
+  const svg=$("costChart"); clear(svg); const W=760,H=440,L=78,R=152,T=50,B=64; const cmax=1.5;
+  const keys=["none","mens","womens","both","model"]; const cols={none:css("--ctrl"),mens:css("--mens"),womens:css("--womens"),both:css("--both"),model:css("--ink")};
+  const names={none:"Send nothing",mens:"Men's to all",womens:"Women's to all",both:"Bought-both only",model:"Model top "+Math.round(s.f*100)+"%"};
+  const full={none:"Send nothing",mens:"Men's email to everyone",womens:"Women's email to everyone",both:"Men's email, bought-both only",model:"Uplift model, top "+Math.round(s.f*100)+"%"};
+  const all=[]; keys.forEach(k=>{ [0,cmax].forEach(c=>all.push(profitPC(k,s,c))); });
+  const ay=niceScale(Math.min(0,...all), Math.max(...all)*1.04, 6), yd=Math.max(2,decs(ay.step));
+  const x=c=>L+(W-L-R)*c/cmax, y=v=>T+(H-T-B)*(1-(v-ay.min)/(ay.max-ay.min));
+  el("rect",{class:"zone-good",x:L,y:T,width:W-L-R,height:y(0)-T},svg); el("rect",{class:"zone-bad",x:L,y:y(0),width:W-L-R,height:H-B-y(0)},svg);
+  ay.ticks.forEach(v=>{ el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:css("--grid")},svg); el("line",{x1:L-5,x2:L,y1:y(v),y2:y(v),stroke:css("--ink")},svg); txt(svg,L-9,y(v)+4.5,usd(v,yd),{"text-anchor":"end"}); });
+  [0,0.25,0.5,0.75,1,1.25,1.5].forEach(c=>{ el("line",{x1:x(c),x2:x(c),y1:H-B,y2:H-B+5,stroke:css("--ink")},svg); txt(svg,x(c),H-B+21,usd(c,2),{"text-anchor":"middle"}); });
+  el("line",{x1:L,x2:W-R,y1:y(0),y2:y(0),stroke:css("--ink"),"stroke-width":2},svg);
+  el("line",{x1:L,x2:L,y1:T,y2:H-B,stroke:css("--ink"),"stroke-width":2},svg); el("line",{x1:L,x2:W-R,y1:H-B,y2:H-B,stroke:css("--ink"),"stroke-width":2},svg);
+  txt(svg,W-R-10,T+20,"PROFIT: above $0 you earn money",{class:"lbl zone","text-anchor":"end"}); txt(svg,W-R-10,H-B-12,"LOSS: below $0 you lose money",{class:"lbl zone","text-anchor":"end"});
+  txt(svg,(L+W-R)/2,H-14,"Cost per email ($)",{"text-anchor":"middle",class:"lbl ax"});
+  txt(svg,0,0,"Profit per customer ($)",{transform:`translate(18 ${(T+H-B)/2}) rotate(-90)`,"text-anchor":"middle",class:"lbl ax"});
+  keys.forEach(k=>{ const pts=[0,cmax].map(c=>[x(c),y(profitPC(k,s,c))]);
+    el("polyline",{points:pts.map(q=>q.join(",")).join(" "),fill:"none",stroke:cols[k],"stroke-width":k===pol?6:3.5,"stroke-linecap":"round"},svg); });
+  const cross=k=>{ if(k==="none") return null; const a=profitPC(k,s,0), b=profitPC(k,s,cmax); return (a>0&&b<0)||(a<0&&b>0)? cmax*a/(a-b) : null; };
+  keys.forEach(k=>{ const z=cross(k); if(z!==null){ el("circle",{cx:x(z),cy:y(0),r:7,fill:css("--card"),stroke:cols[k],"stroke-width":3.5},svg); txt(svg,x(z),y(0)+25,usd(z,2),{"text-anchor":"middle",class:"lbl halo"}); } });
+  const cc=Math.min(s.c,cmax);
+  el("line",{x1:x(cc),x2:x(cc),y1:T,y2:H-B,stroke:css("--ink"),"stroke-width":2.5},svg);
+  keys.forEach(k=>el("circle",{cx:x(cc),cy:y(profitPC(k,s,cc)),r:6,fill:cols[k],stroke:css("--card"),"stroke-width":2.5},svg));
+  const right=cc>cmax*0.6;
+  txt(svg,x(cc)+(right?-8:8),T-14,"Your cost: "+usd(s.c)+" per email",{"text-anchor":right?"end":"start",class:"lbl"});
+  const ends=keys.map(k=>y(profitPC(k,s,cmax))), order=ends.map((v,i)=>i).sort((i,j)=>ends[i]-ends[j]), pos=ends.slice();
+  for(let q=1;q<order.length;q++){ const i=order[q-1], j=order[q]; if(pos[j]-pos[i]<17) pos[j]=pos[i]+17; }
+  keys.forEach((k,i)=>{ el("circle",{cx:W-R+10,cy:pos[i],r:5,fill:cols[k]},svg); txt(svg,W-R+22,pos[i]+4.5,names[k],{class:"lbl end"}); });
+  // plain-language guide under the chart
+  const at={}; keys.forEach(k=>at[k]=profitPC(k,s)); const top=keys.reduce((a,k)=>at[k]>at[a]?k:a,keys[0]);
+  const how=[["Each line","One email policy: its profit per customer at every cost per email"],["Above or below $0","Above the $0 line a policy earns money; below it, the policy loses money"],
+    ["Vertical line and dots","Your cost per email, "+usd(s.c)+". Compare the dots to see which policy is highest at your cost"],["Rings on the $0 line","Break-even cost: the price per email at which that policy stops earning money"],["Thick line","The policy you picked on the left"]];
+  const near=keys.slice().sort((a,b)=>at[b]-at[a]).map(k=>{ const z=cross(k);
+    const be=k==="none"?"Not applicable":(z!==null?usd(z,2):(profitPC(k,s,0)>0?"Above "+usd(cmax,2):"Loses money at every cost"));
+    const w=k==="none"?"Baseline: no email and no email cost":(k===top?"Highest profit at your cost":(at[k]<at.none?"Earns less than sending nothing":"Earns less than the best policy"));
+    return [full[k]+(k===top?' <span class="pill good">Best</span>':""),usd(at[k],3),be,w]; });
+  $("costGuide").innerHTML='<div><h3>How to read this chart</h3>'+tbl(["Item","What it means"],how,{item:true})+'</div><div><h3>At your cost of '+usd(s.c)+' per email</h3>'+tbl(["Policy","Profit per customer","Break-even cost","Why"],near,{item:true})+'</div>';
+}
+(function(){
+  $("policyRadios").innerHTML=POL.map(([k,l])=>`<label><input type="radio" name="pol" value="${k}" ${k===pol?"checked":""}>${l}</label>`).join("");
+  document.querySelectorAll("input[name=pol]").forEach(r=>r.addEventListener("change",()=>{pol=r.value;drawSim();}));
+  ["margin","cost","cust","topf"].forEach(id=>$(id).addEventListener("input",drawSim));
+  drawSim();
+})();
+
+// ---- policy table
+(function(){
+  const P=D.policy; const order=["Send nothing","Blanket women's email","Blanket men's email","Affinity rule (match past purchases)","Random arm","Men's email to 'bought both' only","Uplift model, gradient boosting","Uplift model, logistic"];
+  const lab={"Blanket women's email":"Women's email to everyone","Blanket men's email":"Men's email to everyone","Random arm":"Random email arm","Men's email to 'bought both' only":"Men's email, bought-both only"};
+  const reason=(k,v)=>{ if(k==="Blanket men's email") return "Reference policy for the comparison";
+    if(k==="Send nothing") return "Baseline: no email and no cost";
+    const ci=v.vs_blanket_mens_ci; return ci[0]>0?"Earns clearly more than men's email to everyone":ci[1]<0?"Earns clearly less than men's email to everyone":"Not clearly different from men's email to everyone"; };
+  $("policyTable").innerHTML=tbl(["Policy","Profit per customer","95% CI","Vs men's to all","Emailed","Why"], order.map(k=>{
+    const v=P[k]; const e=1-v.share_none; const ref=k==="Blanket men's email";
+    return {cells:[lab[k]||k, usd(v.profit_per_customer,3), usd(v.ci[0],3)+" to "+usd(v.ci[1],3), ref?"reference":sgn(v.vs_blanket_mens,3)+" ("+sgn(v.vs_blanket_mens_ci[0],3)+" to "+sgn(v.vs_blanket_mens_ci[1],3)+")", Math.round(e*100)+"%", reason(k,v)], cls:ref?"best":""}}),{num:[1,4],item:true});
+  const um=P["Uplift model, gradient boosting"], af=P["Affinity rule (match past purchases)"], hc=D.high_cost.table, bb=hc["Men's email to 'bought both' only"];
+  $("policyNote").innerHTML=why(["Finding","Result","Why"],[
+    ["Uplift model vs men's to all",sgn(um.vs_blanket_mens,3)+" per customer at "+usd(D.assumptions.cost_per_email)+" per email",um.vs_blanket_mens_ci[0]<=0&&um.vs_blanket_mens_ci[1]>=0?"The interval includes zero, so it cannot be told apart from emailing everyone":"The interval excludes zero"],
+    ["Matching emails to past purchases",sgn(af.vs_blanket_mens,3)+" per customer","It adds nothing over emailing everyone with the men's email"],
+    ["Costlier channel ("+usd(D.high_cost.cost_per_contact)+" per contact)","Emailing everyone loses "+usd(Math.abs(hc["Blanket men's email"].vs_nothing),3)+" per customer vs sending nothing","The cost is above the break-even point"],
+    ["Bought-both group, same channel",sgn(bb.vs_nothing,3)+" per customer ("+sgn(bb.vs_nothing_ci[0],3)+" to "+sgn(bb.vs_nothing_ci[1],3)+")","The one promising target, but it needs a confirming test"]]);
+  const ms=[...new Set(D.sens.map(r=>r.margin))], cs=[...new Set(D.sens.map(r=>r.cost))];
+  const lbl={none:"nothing",blanket_mens:"men's to all",model:"model"};
+  $("heat").innerHTML=`<thead><tr><th>Margin \\ cost per email</th>${cs.map(c=>`<th style="text-align:center">${usd(c)}</th>`).join("")}</tr></thead><tbody>`+ms.map(m=>`<tr><td>${Math.round(m*100)}%</td>${cs.map(c=>{const r=D.sens.find(x=>x.margin===m&&x.cost===c);return `<td class="${r.best}" data-tip="none ${usd(r.none,3)}, men's to all ${usd(r.blanket_mens,3)}, model ${usd(r.model,3)} (emails ${Math.round(r.share_emailed*100)}%)">${lbl[r.best]}</td>`}).join("")}</tr>`).join("")+"</tbody>";
+  $("heatNote").innerHTML=why(["Finding","Result","Why"],[
+    ["What a cell shows","The policy with the highest point estimate","Hover a cell for the three profit figures"],
+    ["Model wins at low cost","Its margin over men's-to-all is a cent or two","That gap is within noise"],
+    ["Model wins at high cost","It mostly stops emailing","It avoids losses rather than finding gains"],
+    ["Decision rule","Below about "+usd(D.bc.breakeven_cost_per_email)+" per email, send the men's email to everyone","Cost per email is the line that matters"]]);
+})();
+
+// ---- method list
+$("methodList").innerHTML=why(["Topic","What was done","Why it matters"],[
+ ["Randomization","Customers were assigned at random to no email, men's email or women's email","Group differences estimate causal effects directly"],
+ ["Biased rollout","The data was thinned so loyal customers were more likely emailed","Selection depends only on observed traits, so adjustment can work; real data usually has unobserved ones too"],
+ ["Uplift model","Predicts visits per arm, then applies conversion per visit and spend per converter; cross-fitted in 5 folds; scored with a self-normalised inverse-propensity estimator","Only about 580 customers converted, so a direct model would be too noisy"],
+ ["Assumptions","40% gross margin and $0.10 per email are placeholders; spend covers two weeks","Long-run value and email fatigue are not measured"],
+ ["Multiple comparisons","The segment table is exploratory","Ten subgroup comparisons will produce some false signals"]]);
+
+// redraw with the right colours when the visitor switches Light, Dark or Auto
+if(window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ location.reload(); });
+window.addEventListener("resize",()=>{});
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+.git
+data
+outputs
+src
+memo
+app/tests
+app/data
+**/__pycache__
+*.zip
+.env
