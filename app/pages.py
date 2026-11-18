@@ -91,6 +91,42 @@ def tick_strip(values, cols=20, rows=6):
     return f'<svg class="ticks" viewBox="0 0 300 52" role="img" aria-label="Profit per customer as the cost per email rises, drawn as dots">{"".join(out)}</svg>'
 
 
+def landing_page(allow_register=True):
+    """First page for visitors who are not signed in. Login and sign-up buttons sit at the top right."""
+    signup_top = '<a class="btn solid" href="/register">Sign up</a>' if allow_register else ""
+    start = '<a class="btn solid" href="/register">Get started free</a>' if allow_register else '<a class="btn solid" href="/login">Log in</a>'
+    feats = [("Campaign planner", "Enter your list size, margin and cost per email. Get the best email policy, the expected profit with a 95% interval and the break-even cost."),
+             ("Customer scorer", "Describe one customer and see whether to send the men's email, the women's email or nothing, with the expected gain and how similar customers behaved."),
+             ("Your data", "Upload a CSV from your own A/B test. Get lift for every group, data checks, who responds, profit and an official report to download.")]
+    cards = "".join(f'<div class="feat"><h3>{e(t)}</h3><p class="what">{e(d)}</p></div>' for t, d in feats)
+    steps = [("Create a free account", "It takes a minute and keeps every result in your history."),
+             ("Pick a tool", "Plan a campaign, score a customer or upload your own test file."),
+             ("Get a report you can trust", "Every number has an interval and a reason, and each run opens as an official A4 report.")]
+    people = [("Email marketers", "Decide which email to send to which customers, and whether the campaign pays for itself."),
+              ("Data and growth analysts", "Upload an A/B test and get lift, intervals, data checks and a report you can hand to a manager."),
+              ("Online store owners", "Enter your margin and cost per email and see the break-even point before you spend.")]
+    who = "".join(f'<div class="feat"><h3>{e(t)}</h3><p class="what">{e(d)}</p></div>' for t, d in people)
+    st = "".join(f'<li><b>{e(t)}</b>{e(d)}</li>' for t, d in steps)
+    return f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{APP_NAME}: which email earns the most profit</title>
+<meta name="description" content="{e(TAGLINE)}">
+{FAVICONS}<link rel="stylesheet" href="/static/landing.css"></head>
+<body class="land"><div class="glow" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+<header class="top"><a class="brand" href="/">{LOGO}<span>{APP_NAME}</span></a>
+<nav aria-label="Page sections"><a href="#who">Who it's for</a><a href="#features">Features</a><a href="#how">How it works</a></nav>
+<div class="cta"><a class="btn" href="/login">Log in</a>{signup_top}</div></header>
+<main><section class="hero"><p class="eyebrow">For email marketers, analysts and online store owners</p><h1>Know which email earns the most profit</h1>
+<p class="sub">Compare campaigns, score customers and analyse your own A/B tests, with clear intervals and plain reasons.</p>
+<div class="actions">{start}</div>
+<p class="fine">Built on a randomized test of 64,000 customers. Estimates, not guarantees.</p></section>
+<section class="sec" id="who"><h2>Made for people who send emails and need proof</h2><div class="grid">{who}</div></section>
+<section class="sec" id="features"><h2>Three tools, one clear answer</h2><div class="grid">{cards}</div></section>
+<section class="sec" id="how"><h2>How it works</h2><ol class="steps">{st}</ol></section>
+<div class="bottom">{start}</div></main>
+<footer class="foot">{APP_NAME}. Source: Hillstrom email test, 64,000 customers, randomized.</footer></body></html>"""
+
+
 def auth_stage(inner):
     """Sign-in screens: the project title on top, the box in the middle, the headline below."""
     return (f'<div class="auth-stage"><h1 class="auth-title"><img class="auth-logo" src="/static/logo-512.png" alt="" width="96" height="96">{APP_NAME}</h1>{inner}<h2 class="auth-headline">{e(TAGLINE)}</h2></div>')

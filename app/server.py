@@ -29,7 +29,7 @@ from store import Store, SESSION_DAYS, RESET_MINUTES
 
 HERE = Path(__file__).parent
 STATIC = HERE / "static"
-STATIC_TYPES = {"app.css": "text/css; charset=utf-8", "header.css": "text/css; charset=utf-8", "app.js": "application/javascript; charset=utf-8",
+STATIC_TYPES = {"app.css": "text/css; charset=utf-8", "header.css": "text/css; charset=utf-8", "landing.css": "text/css; charset=utf-8", "app.js": "application/javascript; charset=utf-8",
                 "print.js": "application/javascript; charset=utf-8", "data.js": "application/javascript; charset=utf-8",
                 "bg-light.svg": "image/svg+xml", "bg-dark.svg": "image/svg+xml",
                 "logo-512.png": "image/png", "logo-128.png": "image/png", "favicon-64.png": "image/png", "apple-touch-icon.png": "image/png",
@@ -37,6 +37,7 @@ STATIC_TYPES = {"app.css": "text/css; charset=utf-8", "header.css": "text/css; c
 MAX_BODY = 64 * 1024
 APP_CSP = ("default-src 'none'; style-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self'; "
            "form-action 'self'; base-uri 'none'; frame-ancestors 'none'")
+LANDING_CSP = ("default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'")
 REPORT_CSP = ("default-src 'none'; style-src 'unsafe-inline'; script-src 'self'; img-src data:; font-src data:; base-uri 'none'; frame-ancestors 'none'")
 EVIDENCE_CSP = ("default-src 'none'; style-src 'unsafe-inline'; font-src data:; form-action 'self'; "
                 "script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'")
@@ -206,7 +207,9 @@ class Handler(BaseHTTPRequestHandler):
             pre, hdr = self._pre()
             return self._send(200, pages.reset_page(m.group(1), pre), headers=hdr)
         if path == "/":
-            return self._redirect("/planner" if self._session() else "/login")
+            if self._session():
+                return self._redirect("/planner")
+            return self._send(200, pages.landing_page(allow_register=app.allow_registration), csp=LANDING_CSP)
 
         sess = self._require_user()
         if not sess:

@@ -258,6 +258,32 @@ class DataServerTests(unittest.TestCase):
         self.assertIn("&lt;img", res["html"])
 
 
+class LandingTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.srv = server.make_server("127.0.0.1", 0, str(Path(cls.tmp.name) / "l.db"), mailer=FakeMailer())
+        cls.port = cls.srv.server_address[1]
+        threading.Thread(target=cls.srv.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.srv.shutdown(); cls.srv.server_close(); cls.tmp.cleanup()
+
+    def test_visitors_see_the_landing_page_with_login_and_signup(self):
+        s, h, page = Client(self.port).request("GET", "/")
+        self.assertEqual(s, 200)
+        self.assertIn('href="/login"', page); self.assertIn('href="/register"', page)
+        self.assertIn("/static/landing.css", page); self.assertNotIn("<script", page); self.assertNotIn("style=", page)
+        self.assertIn("form-action 'none'", h["Content-Security-Policy"])
+        self.assertEqual(Client(self.port).request("GET", "/static/landing.css")[0], 200)
+
+    def test_signed_in_users_go_straight_to_the_app(self):
+        c = Client(self.port); c.register("landing-user@example.com")
+        s, h, _ = c.request("GET", "/")
+        self.assertEqual((s, h["Location"]), (303, "/planner"))
+
+
 class MigrationTests(unittest.TestCase):
     def test_old_database_gains_the_data_kind_and_keeps_its_runs(self):
         with tempfile.TemporaryDirectory() as d:
